@@ -2,7 +2,7 @@ import random
 import os
 from Crypto.Util import number
 
-PRIME_NUMBER_SIZE = 256
+PRIME_NUMBER_SIZE = 64 # 64 , 128 , 256, algo demands.
 
 def draw_prime_number():
     pr = number.getPrime(PRIME_NUMBER_SIZE, os.urandom)
