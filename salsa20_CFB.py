@@ -28,14 +28,14 @@ def salsa20_cfb_decrypt(key, iv, ciphertext):
     # Decryption in CFB is symmetric to encryption
     return salsa20_cfb_encrypt(key, iv, ciphertext)
 
-# Key and IV setup
-key = urandom(32)  # Salsa20 requires a 32-byte key
-iv = urandom(8)    # Salsa20 nonce is 8 bytes
+# # Key and IV setup
+# key = urandom(32)  # Salsa20 requires a 32-byte key
+# iv = urandom(8)    # Salsa20 nonce is 8 bytes
 
-# Example plaintext
-plaintext = b"Hello, this is a test of Salsa20 with CFB mode!"
-# Encrypt and decrypt
-encrypted = salsa20_cfb_encrypt(key, iv, plaintext)
-print("Encrypted:", encrypted)
-decrypted = salsa20_cfb_decrypt(key, iv, encrypted)
-print("Decrypted:", decrypted)
+# # Example plaintext
+# plaintext = b"Hello, this is a test of Salsa20 with CFB mode!"
+# # Encrypt and decrypt
+# encrypted = salsa20_cfb_encrypt(key, iv, plaintext)
+# print("Encrypted:", encrypted)
+# decrypted = salsa20_cfb_decrypt(key, iv, encrypted)
+# print("Decrypted:", decrypted)

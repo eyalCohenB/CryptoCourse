@@ -46,7 +46,7 @@ def draw_parameters(random_prime):
     if not test_equality(y, random_prime, x, a, b):
         return draw_parameters(random_prime)
 
-    print("POINT P - x: " + str(x) + " y: " + str(y) + " is on the curve")
+    # print("POINT P - x: " + str(x) + " y: " + str(y) + " is on the curve")
     return {'a': a, 'b': b, 'x': x, 'y': y}
 
 def add_points(x1, y1, x2, y2, a, p):
@@ -95,69 +95,3 @@ def test_point(r, parameters, p):
     left = (r["y3"]**2) % p
 
     return left == right
-
-def main():
-    # First interaction (Alice and Bob)
-    random_prime1 = draw_prime_number()
-    print(random_prime1, "DRAWN RANDOM PRIME 1")
-    parameters1 = draw_parameters(random_prime1)
-
-    print(parameters1['a'], "a")
-    print(parameters1['b'], "b")
-
-    n1 = 336668
-    n2 = 444466
-
-    point_alice = calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, n1)
-    point_bob = calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, n2)
-
-    print("ALICE POINT: ", point_alice)
-    print("BOB POINT: ", point_bob)
-
-    re1 = test_point(point_alice, parameters1, random_prime1)
-    re2 = test_point(point_bob, parameters1, random_prime1)
-    print(re1)
-    print(re2)
-
-    alice_read_bob = calculate_point(point_bob["x3"], point_bob["y3"], parameters1["a"], random_prime1, n1)
-    bob_read_alice = calculate_point(point_alice["x3"], point_alice["y3"], parameters1["a"], random_prime1, n2)
-
-    print("ALICE READ BOB: ", alice_read_bob)
-    print("BOB READ ALICE: ", bob_read_alice)
-
-    if alice_read_bob["x3"] == bob_read_alice["x3"] and alice_read_bob["y3"] == bob_read_alice["y3"]:
-        print("PROPERLY IMPLEMENTED DIFFIE-HELLMAN PROTOCOL RUN 1")
-
-    # Second interaction (Bob and Eve)
-    random_prime2 = draw_prime_number()
-    print(random_prime2, "DRAWN RANDOM PRIME 2")
-    parameters2 = draw_parameters(random_prime2)
-
-    print(parameters2['a'], "a")
-    print(parameters2['b'], "b")
-
-    n2 = 444466
-    n3 = 555577
-
-    point_eve = calculate_point(parameters2['x'], parameters2['y'], parameters2['a'], random_prime2, n3)
-    point_bob = calculate_point(parameters2['x'], parameters2['y'], parameters2['a'], random_prime2, n2)
-
-    print("EVE POINT: ", point_eve)
-    print("BOB POINT: ", point_bob)
-
-    re3 = test_point(point_eve, parameters2, random_prime2)
-    re2 = test_point(point_bob, parameters2, random_prime2)
-    print(re3)
-    print(re2)
-
-    eve_read_bob = calculate_point(point_bob["x3"], point_bob["y3"], parameters2["a"], random_prime2, n3)
-    bob_read_eve = calculate_point(point_eve["x3"], point_eve["y3"], parameters2["a"], random_prime2, n2)
-
-    print("EVE READ BOB: ", eve_read_bob)
-    print("BOB READ EVE: ", bob_read_eve)
-
-    if eve_read_bob["x3"] == bob_read_eve["x3"] and eve_read_bob["y3"] == bob_read_eve["y3"]:
-        print("PROPERLY IMPLEMENTED DIFFIE-HELLMAN PROTOCOL RUN 2")
-
-# execute program
-main()
