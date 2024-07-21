@@ -12,7 +12,7 @@ def main():
     n1 = 336668
     n2 = 444466
     # key = urandom(32)  # Salsa20 requires a 32-byte key
-    iv = urandom(8)    # Salsa20 nonce is 8 bytes ###### This should be unique for each message ########
+    iv = urandom(16)    # Salsa20 nonce is 8 bytes ###### This should be unique for each message ########
 
     # Users creation:
     alice = user("alice")
