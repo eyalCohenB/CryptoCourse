@@ -1,6 +1,10 @@
+import rabin 
+
 class user:
 
     def __init__(self,name):
+        self.p, self.q = rabin.generate_keys()
+        self.rabin_public = self.p * self.q
         self.name = name
         self.private_key = None
         self.point = None
