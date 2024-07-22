@@ -30,15 +30,33 @@ def sign(message, private_key):
     # Combine the results using CRT
     q_inv = pow(q, -1, p)
     h = (q_inv * (mp - mq)) % p
-    signature = (mq + h * q) % n
+    if h < 0:
+        h += p
 
-    return signature
+    signature1 = (mq + h * q) % n
+    signature2 = (mq - h * q) % n
+    signature3 = (p - mp + h * q) % n
+    signature4 = (p - mp - h * q) % n
+
+    signatures = [signature1, signature2, signature3, signature4]
+    
+    # Validate which signature matches
+    for sig in signatures:
+        if verify(sig, message, n):
+            # print(f"Message Hash: {message_hash}")
+            # print(f"mp: {mp}, mq: {mq}, q_inv: {q_inv}, h: {h}, Signature: {sig}")
+            return sig
+
+    # print(f"Message Hash: {message_hash}")
+    # print(f"mp: {mp}, mq: {mq}, q_inv: {q_inv}, h: {h}, Signatures: {signatures}")
+    return signatures[0]  # Return any valid signature
 
 def verify(signature, message, public_key):
     n = public_key
     message_hash = int.from_bytes(sha256(message).digest(), byteorder='big') % n
     computed_hash = pow(signature, 2, n)
-    return computed_hash == message_hash
 
-def compute_hash(signature, n):
-    return pow(signature, 2, n)
+    # print(f"Message Hash (verification): {message_hash}")
+    # print(f"Computed Hash (verification): {computed_hash}")
+
+    return computed_hash == message_hash

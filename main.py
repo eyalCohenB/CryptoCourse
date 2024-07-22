@@ -23,32 +23,47 @@ def main():
     bob.set_iv(iv)
     bob.set_plainText(b"Hello Alice, nice hearing from you!") # should be in Bytes! hence 'b' at start
 
-    # Sign Alice's message with her private key
-    signature = Rabin.sign(alice.plainText, (alice.p, alice.q))
+    # ECDH Key Exchange
+    alice.set_point(ECDH.calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, alice.private_key))
+    bob.set_point(ECDH.calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, bob.private_key))
+    alice_read_bob = ECDH.calculate_point(bob.point["x3"], bob.point["y3"], parameters1["a"], random_prime1, alice.private_key)
+    bob_read_alice = ECDH.calculate_point(alice.point["x3"], alice.point["y3"], parameters1["a"], random_prime1, bob.private_key)
 
-    # Bob verifies the signature with Alice's public key
-    verification = Rabin.verify(signature, alice.plainText, alice.rabin_public)
-    print("Signature Verified by Bob:", verification)
-    if verification:
-        # ECDH Verification:
-        alice.set_point(ECDH.calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, alice.private_key))
-        bob.set_point(ECDH.calculate_point(parameters1['x'], parameters1['y'], parameters1['a'], random_prime1, bob.private_key))
-        alice_read_bob = ECDH.calculate_point(bob.point["x3"], bob.point["y3"], parameters1["a"], random_prime1, alice.private_key)
-        bob_read_alice = ECDH.calculate_point(alice.point["x3"], alice.point["y3"], parameters1["a"], random_prime1, bob.private_key)
+    if alice_read_bob["x3"] == bob_read_alice["x3"] and alice_read_bob["y3"] == bob_read_alice["y3"]:
+        print("PROPERLY IMPLEMENTED DIFFIE-HELLMAN PROTOCOL")
+        print("Alice Sends Bob an encrypted text:")
 
-        if alice_read_bob["x3"] == bob_read_alice["x3"] and alice_read_bob["y3"] == bob_read_alice["y3"]:
-            print("PROPERLY IMPLEMENTED DIFFIE-HELLMAN PROTOCOL")
-            print("Alice Sends Bob an encrypted text:")
-            # SALSA20 CFB Encryption / Decryption:
-            # Key derivation from ECDH result
-            alice.salsa_key = alice_read_bob["x3"].to_bytes(32, byteorder='big')
-            bob.salsa_key = bob_read_alice["x3"].to_bytes(32, byteorder='big')
+        # Key derivation from ECDH result
+        alice.salsa_key = alice_read_bob["x3"].to_bytes(32, byteorder='big')
+        bob.salsa_key = bob_read_alice["x3"].to_bytes(32, byteorder='big')
 
-            alice_encrypted = salsa20_CFB.salsa20_cfb_encrypt(alice.salsa_key, alice.iv, alice.plainText)
-            print("Encrypted:", alice_encrypted)
-            bob_decrypted = salsa20_CFB.salsa20_cfb_decrypt(bob.salsa_key, bob.iv, alice_encrypted)
-            print("Decrypted:", bob_decrypted)
+        # Sign Alice's message with her private key
+        signature = Rabin.sign(alice.plainText, (alice.p, alice.q))
+        # print("Signature:", signature)
 
-        
+        # Encrypt the message and the signature
+        message_and_signature = alice.plainText + b"||" + str(signature).encode()
+        alice_encrypted = salsa20_CFB.salsa20_cfb_encrypt(alice.salsa_key, alice.iv, message_and_signature)
+        print("Encrypted:", alice_encrypted)
+
+        # Simulate transmission and reception
+        received_encrypted = alice_encrypted
+
+        # Decrypt the message
+        bob_decrypted = salsa20_CFB.salsa20_cfb_decrypt(bob.salsa_key, bob.iv, received_encrypted)
+
+
+        # Split the decrypted message and the signature
+        received_message, received_signature = bob_decrypted.split(b'||')
+        received_signature = int(received_signature.decode())
+
+        # print("Received message:", received_message)
+        # print("Received signature:", received_signature)
+
+        # Verify the signature with Alice's public key
+        verification = Rabin.verify(received_signature, received_message, alice.rabin_public)
+        print("Signature Verified by Bob:", verification)
+        if verification:
+            print("Decrypted:", received_message)
 
 main()
