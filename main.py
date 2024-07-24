@@ -3,6 +3,8 @@ from user import user
 from os import urandom
 import salsa20_CFB
 import rabin as Rabin
+import binascii
+
 
 def main():
     # Parameters Prep    
@@ -38,12 +40,12 @@ def main():
         bob.salsa_key = bob_read_alice["x3"].to_bytes(32, byteorder='big')
 
         # Sign Alice's message with her private key
-        signature = Rabin.sign(alice.plainText, (alice.p, alice.q))
+        signature = Rabin.sign_rabin(alice.p, alice.q,binascii.hexlify(alice.plainText))
         # print("Signature:", signature)
 
         # Encrypt the message and the signature
-        message_and_signature = alice.plainText + b"||" + str(signature).encode()
-        alice_encrypted = salsa20_CFB.salsa20_cfb_encrypt(alice.salsa_key, alice.iv, message_and_signature)
+        # message_and_signature = alice.plainText #+ b"||" + str(signature).encode()
+        alice_encrypted = salsa20_CFB.salsa20_cfb_encrypt(alice.salsa_key, alice.iv, alice.plainText)
         print("Encrypted:", alice_encrypted)
 
         # Simulate transmission and reception
@@ -54,16 +56,16 @@ def main():
 
 
         # Split the decrypted message and the signature
-        received_message, received_signature = bob_decrypted.split(b'||')
-        received_signature = int(received_signature.decode())
-
+        # received_message = bob_decrypted#.split(b'||')
+        message = bob_decrypted.decode('utf-8')
+        hexmessage = binascii.hexlify(message.encode())
         # print("Received message:", received_message)
         # print("Received signature:", received_signature)
 
         # Verify the signature with Alice's public key
-        verification = Rabin.verify(received_signature, received_message, alice.rabin_public)
+        verification = Rabin.verify(alice.rabin_public,hexmessage, signature[0],signature[1])
         print("Signature Verified by Bob:", verification)
         if verification:
-            print("Decrypted:", received_message)
+            print("Decrypted:", message)
 
 main()
