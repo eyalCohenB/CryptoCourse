@@ -41,27 +41,14 @@ def main():
 
         # Sign Alice's message with her private key
         signature = Rabin.sign_rabin(alice.p, alice.q,binascii.hexlify(alice.plainText))
-        # print("Signature:", signature)
-
-        # Encrypt the message and the signature
-        # message_and_signature = alice.plainText #+ b"||" + str(signature).encode()
         alice_encrypted = salsa20_CFB.salsa20_cfb_encrypt(alice.salsa_key, alice.iv, alice.plainText)
         print("Encrypted:", alice_encrypted)
-
         # Simulate transmission and reception
         received_encrypted = alice_encrypted
-
         # Decrypt the message
         bob_decrypted = salsa20_CFB.salsa20_cfb_decrypt(bob.salsa_key, bob.iv, received_encrypted)
-
-
-        # Split the decrypted message and the signature
-        # received_message = bob_decrypted#.split(b'||')
         message = bob_decrypted.decode('utf-8')
         hexmessage = binascii.hexlify(message.encode())
-        # print("Received message:", received_message)
-        # print("Received signature:", received_signature)
-
         # Verify the signature with Alice's public key
         verification = Rabin.verify(alice.rabin_public,hexmessage, signature[0],signature[1])
         print("Signature Verified by Bob:", verification)

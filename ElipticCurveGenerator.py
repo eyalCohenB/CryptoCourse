@@ -46,7 +46,6 @@ def draw_parameters(random_prime):
     if not test_equality(y, random_prime, x, a, b):
         return draw_parameters(random_prime)
 
-    # print("POINT P - x: " + str(x) + " y: " + str(y) + " is on the curve")
     return {'a': a, 'b': b, 'x': x, 'y': y}
 
 def add_points(x1, y1, x2, y2, a, p):
