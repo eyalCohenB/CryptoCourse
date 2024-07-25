@@ -32,7 +32,7 @@ def main():
     bob_read_alice = ECDH.calculate_point(alice.point["x3"], alice.point["y3"], parameters1["a"], random_prime1, bob.private_key)
 
     if alice_read_bob["x3"] == bob_read_alice["x3"] and alice_read_bob["y3"] == bob_read_alice["y3"]:
-        print("PROPERLY IMPLEMENTED DIFFIE-HELLMAN PROTOCOL")
+        print("Properly implemented Diffie-Hellman protocol.")
         print("Alice Sends Bob an encrypted text:")
 
         # Key derivation from ECDH result
