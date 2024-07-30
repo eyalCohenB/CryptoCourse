@@ -6,6 +6,23 @@ import rabin as Rabin
 import binascii
 
 
+
+
+def send_message(sender, receivers):
+            print(f"{sender.name} Sends {', '.join([r.name for r in receivers])} an encrypted text:")
+            signature = Rabin.sign_rabin(sender.p, sender.q, binascii.hexlify(sender.plainText))
+            encrypted = salsa20_CFB.salsa20_cfb_encrypt(sender.salsa_key, sender.iv, sender.plainText)
+            print("Encrypted:", encrypted)
+            for receiver in receivers:
+                decrypted = salsa20_CFB.salsa20_cfb_decrypt(receiver.salsa_key, receiver.iv, encrypted)
+                message = decrypted.decode('utf-8')
+                hexmessage = binascii.hexlify(message.encode())
+                verification = Rabin.verify(sender.rabin_public, hexmessage, signature[0], signature[1])
+                print(f"Signature Verified by {receiver.name}: {verification}")
+                if verification:
+                    print(f"Decrypted by {receiver.name}:", message)
+
+
 def main():
     # Parameters Prep    
     random_prime1 = ECDH.draw_prime_number()
@@ -56,20 +73,6 @@ def main():
         alice.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
         bob.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
         carol.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
-
-        def send_message(sender, receivers):
-            print(f"{sender.name} Sends {', '.join([r.name for r in receivers])} an encrypted text:")
-            signature = Rabin.sign_rabin(sender.p, sender.q, binascii.hexlify(sender.plainText))
-            encrypted = salsa20_CFB.salsa20_cfb_encrypt(sender.salsa_key, sender.iv, sender.plainText)
-            print("Encrypted:", encrypted)
-            for receiver in receivers:
-                decrypted = salsa20_CFB.salsa20_cfb_decrypt(receiver.salsa_key, receiver.iv, encrypted)
-                message = decrypted.decode('utf-8')
-                hexmessage = binascii.hexlify(message.encode())
-                verification = Rabin.verify(sender.rabin_public, hexmessage, signature[0], signature[1])
-                print(f"Signature Verified by {receiver.name}: {verification}")
-                if verification:
-                    print(f"Decrypted by {receiver.name}:", message)
 
         # Alice sends message to Bob and Carol
         alice.set_plainText(b"Hello Bob and Carol, this is Alice Sending you A message!")  # Update message
