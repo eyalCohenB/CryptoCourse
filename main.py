@@ -30,7 +30,7 @@ def main():
     n1 = 336668
     n2 = 444466
     n3 = 555577  
-    iv = urandom(16)  # Salsa20 nonce is 16 bytes ###### This should be unique for each message ########
+    iv = urandom(64)  # Salsa20 nonce is 16 bytes ###### This should be unique for each message ########
 
     # Users creation:
     alice = user("alice")
