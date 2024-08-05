@@ -29,7 +29,7 @@ def main():
     parameters1 = ECDH.draw_parameters(random_prime1)
     n1 = 336668
     n2 = 444466
-    n3 = 555577  
+    n3 = 555577
     iv = urandom(64)  # Salsa20 nonce is 16 bytes ###### This should be unique for each message ########
 
     # Users creation:
@@ -70,9 +70,9 @@ def main():
 
         # Key derivation from ECDH result
         shared_secret = ECDH.calculate_point(alice_read_bob["x3"], alice_read_bob["y3"], parameters1["a"], random_prime1, carol.private_key)
-        alice.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
-        bob.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
-        carol.salsa_key = shared_secret["x3"].to_bytes(32, byteorder='big')
+        alice.salsa_key = shared_secret["x3"].to_bytes(64, byteorder='big')
+        bob.salsa_key = shared_secret["x3"].to_bytes(64, byteorder='big')
+        carol.salsa_key = shared_secret["x3"].to_bytes(64, byteorder='big')
 
         # Alice sends message to Bob and Carol
         alice.set_plainText(b"Hello Bob and Carol, this is Alice Sending you A message!")  # Update message
