@@ -5,9 +5,6 @@ import salsa20_CFB
 import rabin as Rabin
 import binascii
 
-
-
-
 def send_message(sender, receivers):
             print(f"{sender.name} Sends {', '.join([r.name for r in receivers])} an encrypted text:")
             signature = Rabin.sign_rabin(sender.p, sender.q, binascii.hexlify(sender.plainText))
@@ -21,7 +18,6 @@ def send_message(sender, receivers):
                 print(f"Signature Verified by {receiver.name}: {verification}")
                 if verification:
                     print(f"Decrypted by {receiver.name}:", message)
-
 
 def main():
     # Parameters Prep    
@@ -90,4 +86,5 @@ def main():
         print()
 
 
-main()
+if __name__ == "__main__":
+    main()
